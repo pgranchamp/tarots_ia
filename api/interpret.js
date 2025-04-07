@@ -7,7 +7,6 @@ export default async function handler(req, res) {
     }
 
     // Extraire les données du tirage
-    console.log("Requête reçue:", req.body);
     const { past, present, future } = req.body;
 
     // Vérifier que toutes les cartes sont présentes
@@ -16,7 +15,7 @@ export default async function handler(req, res) {
     }
     
     try {
-      // Appel à l'API Mistral
+      // Utiliser un modèle Mistral plus petit et plus rapide
       const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -24,26 +23,29 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${process.env.MISTRAL_API_KEY}`
         },
         body: JSON.stringify({
-          model: "mistral-large-latest", // Utiliser le modèle approprié
+          model: "mistral-small", // Plus rapide que mistral-large-latest
           messages: [
             {
               role: "user",
-              content: `Tu es un expert en lecture de tarot. Interprète ce tirage de tarot à trois cartes avec détail.
+              content: `Interprète ce tirage de tarot à trois cartes de façon concise.
               
               Passé: ${past.name} (mots-clés: ${past.keywords})
               Présent: ${present.name} (mots-clés: ${present.keywords})
               Futur: ${future.name} (mots-clés: ${future.keywords})
               
-              Format de sortie:
-              - Une introduction brève sur le tirage
-              - Une section détaillée pour chaque carte (Passé, Présent, Futur)
-              - Une synthèse des interconnexions entre les trois cartes
-              - Un conseil pratique basé sur cette lecture
-              
-              Utilise le format HTML avec des balises <h3> pour les titres de section.`
+              Format HTML:
+              <h3>Le Passé</h3>
+              <p>Interprétation concise</p>
+              <h3>Le Présent</h3>
+              <p>Interprétation concise</p>
+              <h3>Le Futur</h3>
+              <p>Interprétation concise</p>
+              <h3>Synthèse</h3>
+              <p>Brève synthèse</p>`
             }
           ],
-          temperature: 0.7 // Ajuster pour plus ou moins de créativité
+          temperature: 0.7,
+          max_tokens: 500 // Limiter la taille de la réponse
         })
       });
 
@@ -55,7 +57,6 @@ export default async function handler(req, res) {
       }
       
       const data = await response.json();
-      console.log("Réponse API:", JSON.stringify(data).substring(0, 200) + "...");
       
       // Vérifier la structure de la réponse
       if (data.choices && data.choices[0] && data.choices[0].message) {
@@ -78,30 +79,19 @@ export default async function handler(req, res) {
         <h3>Le Passé : ${past.name}</h3>
         <p>Cette carte représente les fondations de votre situation actuelle. 
         ${past.name} dans la position du passé suggère que vous avez traversé une période 
-        caractérisée par des éléments liés à ${past.keywords}. Ces expériences ont façonné 
-        votre approche actuelle et continuent d'influencer vos décisions.</p>
+        caractérisée par des éléments liés à ${past.keywords}.</p>
         
         <h3>Le Présent : ${present.name}</h3>
-        <p>Dans votre situation actuelle, l'énergie de ${present.name} est prédominante. 
-        Cette carte, associée à ${present.keywords}, indique que vous êtes dans une phase 
-        où ces qualités sont particulièrement importantes à reconnaître et à intégrer dans 
-        votre approche.</p>
+        <p>Dans votre situation actuelle, l'énergie de ${present.name} est prédominante, 
+        associée à ${present.keywords}.</p>
         
         <h3>Le Futur : ${future.name}</h3>
-        <p>${future.name} apparaît comme la résultante probable de votre trajectoire actuelle. 
-        Cette carte, liée à ${future.keywords}, suggère que les défis et opportunités à venir 
-        seront teintés par ces aspects.</p>
+        <p>${future.name} apparaît comme la résultante probable de votre trajectoire actuelle, 
+        liée à ${future.keywords}.</p>
         
         <h3>Synthèse</h3>
         <p>La progression de ${past.name} à ${present.name}, puis vers ${future.name} raconte 
-        une histoire cohérente de transformation. La présence de ces trois arcanes majeurs 
-        indique que vous traversez un cycle important de votre vie, avec des leçons significatives 
-        à intégrer.</p>
-        
-        <h3>Conseil</h3>
-        <p>Pour maximiser le potentiel positif de ce tirage, soyez attentif aux moments où les thèmes 
-        de ${present.keywords} se manifestent dans votre vie quotidienne, car ils représentent des 
-        opportunités de transformation vers l'énergie de ${future.name}.</p>
+        une histoire cohérente de transformation.</p>
       `;
       
       return res.status(200).json({ 
