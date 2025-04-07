@@ -9,5 +9,3 @@
     { "src": "/api/interpret", "dest": "/api/interpret.js" }
   ]
 }
-  ]
-}
