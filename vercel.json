@@ -2,10 +2,12 @@
   "version": 2,
   "builds": [
     { "src": "index.html", "use": "@vercel/static" },
-    { "src": "public/**/*", "use": "@vercel/static" },
+    { "src": "public/**", "use": "@vercel/static" },
     { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/interpret", "dest": "/api/interpret.js" }
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/api/interpret", "dest": "/api/interpret.js" },
+    { "src": "/images/(.*)", "dest": "/public/images/$1" }
   ]
 }
