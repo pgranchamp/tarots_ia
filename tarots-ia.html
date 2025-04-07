@@ -371,50 +371,31 @@
         });
 
         // Fonction pour générer une interprétation (simulée)
-        function generateInterpretation(cards) {
-            // Ceci simule la réponse que vous recevriez de l'API Mistral
-            // Dans une implémentation réelle, cette partie serait remplacée par un appel API
-            
-            const past = cards.past;
-            const present = cards.present;
-            const future = cards.future;
-            
-            let interpretation = `
-                <p>Votre tirage révèle une histoire fascinante à travers ces trois arcanes majeurs :</p>
-                
-                <h3>Le Passé : ${past.name}</h3>
-                <p>Cette carte représente les fondations de votre situation actuelle. 
-                ${past.name} dans la position du passé suggère que vous avez traversé une période 
-                caractérisée par des éléments liés à ${past.keywords}. Ces expériences ont façonné 
-                votre approche actuelle et continuent d'influencer vos décisions.</p>
-                
-                <h3>Le Présent : ${present.name}</h3>
-                <p>Dans votre situation actuelle, l'énergie de ${present.name} est prédominante. 
-                Cette carte, associée à ${present.keywords}, indique que vous êtes dans une phase 
-                où ces qualités sont particulièrement importantes à reconnaître et à intégrer dans 
-                votre approche.</p>
-                
-                <h3>Le Futur : ${future.name}</h3>
-                <p>${future.name} apparaît comme la résultante probable de votre trajectoire actuelle. 
-                Cette carte, liée à ${future.keywords}, suggère que les défis et opportunités à venir 
-                seront teintés par ces aspects.</p>
-                
-                <h3>Synthèse</h3>
-                <p>La progression de ${past.name} à ${present.name}, puis vers ${future.name} raconte 
-                une histoire cohérente de transformation. La présence de ces trois arcanes majeurs 
-                indique que vous traversez un cycle important de votre vie, avec des leçons significatives 
-                à intégrer. Les énergies combinées de ces cartes suggèrent qu'en reconnaissant les 
-                schémas du passé (${past.name}), en embrassant pleinement les défis actuels (${present.name}), 
-                vous pourrez naviguer vers un avenir qui manifeste les aspects positifs de ${future.name}.</p>
-                
-                <p>Pour maximiser le potentiel positif de ce tirage, soyez attentif aux moments où les thèmes 
-                de ${present.keywords} se manifestent dans votre vie quotidienne, car ils représentent des 
-                opportunités de transformation vers l'énergie de ${future.name}.</p>
-            `;
-            
-            return interpretation;
-        }
-
+        // Remplacez la fonction generateInterpretation par ceci
+async function generateInterpretation(cards) {
+  try {
+    const response = await fetch('/api/interpret', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        past: cards.past,
+        present: cards.present,
+        future: cards.future
+      })
+    });
+    
+    const data = await response.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    return data.interpretation;
+  } catch (error) {
+    console.error("Erreur:", error);
+    return "<p>Une erreur s'est produite lors de l'interprétation. Veuillez réessayer.</p>";
+  }
+}
         // Animation du deck au chargement
         window.addEventListener('load', function() {
             setTimeout(() => {
