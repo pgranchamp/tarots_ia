@@ -66,7 +66,7 @@
         
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 1rem;
             text-align: center;
@@ -76,8 +76,8 @@
         
         header {
             position: relative;
-            margin-bottom: 2rem;
-            padding: 1.5rem 0;
+            margin-bottom: 1.5rem;
+            padding: 1rem 0;
             overflow: hidden;
         }
         
@@ -120,7 +120,7 @@
         
         .intro {
             font-size: 1.1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             line-height: 1.5;
             max-width: 800px;
             margin-left: auto;
@@ -135,7 +135,7 @@
             font-style: italic;
             font-size: 0.9rem;
             opacity: 0.8;
-            margin-top: 1rem;
+            margin-top: 0.5rem;
         }
         
         .tarot-board {
@@ -148,7 +148,7 @@
         .tarot-row {
             display: flex;
             justify-content: center;
-            gap: 1rem;
+            gap: 1.5rem;
             flex-wrap: wrap;
         }
         
@@ -158,10 +158,6 @@
             align-items: center;
             gap: 0.5rem;
             transition: transform 0.3s ease;
-        }
-        
-        .card-position:hover {
-            transform: translateY(-5px);
         }
         
         .card-label {
@@ -184,9 +180,10 @@
             opacity: 0.6;
         }
         
+        /* Cartes plus grandes */
         .card-placeholder {
-            width: 110px;
-            height: 180px;
+            width: 140px;
+            height: 230px;
             background: linear-gradient(135deg, rgba(66, 75, 108, 0.3), rgba(44, 52, 85, 0.5));
             border: 2px solid var(--card-border);
             border-radius: 10px;
@@ -202,12 +199,19 @@
         
         @media (min-width: 768px) {
             .card-placeholder {
-                width: 140px;
-                height: 230px;
+                width: 160px;
+                height: 260px;
             }
         }
         
-        .card-placeholder:hover {
+        @media (min-width: 1024px) {
+            .card-placeholder {
+                width: 180px;
+                height: 290px;
+            }
+        }
+        
+        .card-placeholder:hover, .card-placeholder:active {
             transform: translateY(-10px) rotate(2deg);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
             border-color: var(--accent-color);
@@ -220,7 +224,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
         
-        .card-placeholder.drawn:hover {
+        .card-placeholder.drawn:hover, .card-placeholder.drawn:active {
             transform: translateY(-5px) rotate(0);
         }
         
@@ -232,7 +236,7 @@
             transition: transform 0.3s ease;
         }
         
-        .card-placeholder.drawn:hover img {
+        .card-placeholder.drawn:hover img, .card-placeholder.drawn:active img {
             transform: scale(1.05);
         }
         
@@ -260,7 +264,7 @@
             transition: all 0.3s ease;
         }
         
-        .card-placeholder:hover::after {
+        .card-placeholder:hover::after, .card-placeholder:active::after {
             opacity: 1;
             margin-top: 25px;
         }
@@ -275,8 +279,9 @@
             width: 160px;
             height: 200px;
             perspective: 1000px;
-            margin: 2rem auto;
+            margin: 1.5rem auto;
             position: relative;
+            cursor: pointer;
         }
         
         .deck {
@@ -409,11 +414,11 @@
             transition: all 0.5s ease;
         }
         
-        button:hover::before {
+        button:hover::before, button:active::before {
             left: 100%;
         }
         
-        button:hover {
+        button:hover, button:active {
             background: linear-gradient(135deg, var(--button-hover), var(--button-bg));
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -557,7 +562,7 @@
             animation: deckPulse 2s infinite;
         }
         
-        /* Responsive design amélioré */
+        /* Amélioration du layout pour mobile */
         @media (max-width: 768px) {
             .container {
                 padding: 0.8rem;
@@ -572,19 +577,30 @@
                 margin-bottom: 1rem;
             }
             
-            .card-position {
-                margin-bottom: 1rem;
+            /* Garde les cartes sur une ligne pour les écrans plus larges en mode portrait */
+            @media (min-width: 500px) {
+                .tarot-row {
+                    flex-direction: row;
+                }
             }
             
-            .tarot-row {
-                flex-direction: column;
-                align-items: center;
-                gap: 2rem;
-            }
-            
-            .card-placeholder {
-                width: 120px;
-                height: 200px;
+            /* Layout vertical pour les petits écrans */
+            @media (max-width: 499px) {
+                .tarot-row {
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 2rem;
+                }
+                
+                .card-position {
+                    margin-bottom: 0.5rem;
+                }
+                
+                /* Cartes plus grandes sur les petits écrans */
+                .card-placeholder {
+                    width: 160px;
+                    height: 260px;
+                }
             }
             
             .interpretation {
@@ -608,11 +624,6 @@
         @media (max-width: 380px) {
             h1 {
                 font-size: 1.8rem;
-            }
-            
-            .card-placeholder {
-                width: 100px;
-                height: 170px;
             }
             
             button {
@@ -663,6 +674,28 @@
             text-align: center;
             padding: 1rem;
         }
+        
+        /* Amélioration pour indiquer que le deck est cliquable */
+        .deck-clickable {
+            position: relative;
+        }
+        
+        .deck-clickable::after {
+            content: "Touchez pour mélanger";
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+            white-space: nowrap;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .deck-clickable:hover::after, .deck-clickable:active::after {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -675,11 +708,11 @@
             <div class="intro">
                 <p>Bienvenue dans votre consultation de tarot guidée par l'intelligence artificielle.</p>
                 <p>Concentrez-vous sur votre question pendant que vous tirez trois cartes : une pour votre passé, une pour votre présent, et une pour le futur qui en résulte.</p>
-                <div class="instruction">Touchez le deck puis chaque emplacement pour tirer vos cartes</div>
+                <div class="instruction">Touchez chaque emplacement pour tirer une carte</div>
             </div>
         </header>
         
-        <div class="tarot-deck" id="tarotDeckContainer">
+        <div class="tarot-deck deck-clickable" id="tarotDeckContainer" onclick="animateDeck()">
             <div class="deck-shadow"></div>
             <div class="deck-shadow"></div>
             <div class="deck deck-pulse" id="tarotDeck"></div>
@@ -792,6 +825,62 @@
             }
         }
         
+        // Animation du deck lorsqu'on le touche
+        function animateDeck() {
+            const deck = document.getElementById('tarotDeck');
+            
+            // Arrêter l'animation de pulsation
+            deck.classList.remove('deck-pulse');
+            
+            // Animation de mélange
+            // Série de mouvements aléatoires rapides
+            const shakeTimes = 6;
+            let delay = 0;
+            const delayIncrement = 100;
+            
+            for (let i = 0; i < shakeTimes; i++) {
+                setTimeout(() => {
+                    const rotateX = Math.random() * 10 - 5;
+                    const rotateY = Math.random() * 10 - 5;
+                    const translateX = Math.random() * 10 - 5;
+                    const translateY = Math.random() * 10 - 5;
+                    
+                    deck.style.transform = `translateX(${translateX}px) translateY(${translateY}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                }, delay);
+                
+                delay += delayIncrement;
+            }
+            
+            // Retour à la position normale
+            setTimeout(() => {
+                deck.style.transform = 'translateY(-10px) rotate(3deg)';
+                
+                setTimeout(() => {
+                    deck.style.transform = 'translateY(0) rotate(0)';
+                    
+                    // Réactiver l'animation de pulsation si toutes les cartes n'ont pas été tirées
+                    if (Object.values(drawnCards).filter(card => card !== null).length < 3) {
+                        setTimeout(() => {
+                            deck.classList.add('deck-pulse');
+                        }, 500);
+                    }
+                }, 500);
+            }, delay);
+            
+            // Vibration sur mobile (si supporté)
+            if (navigator.vibrate) {
+                navigator.vibrate([50, 50, 50]);
+            }
+            
+            // Ressemble les cartes
+            shuffledDeck = [...tarotCards];
+            shuffleCards(shuffledDeck);
+            
+            // Effet de particules
+            const rect = deck.getBoundingClientRect();
+            createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
+        
         // Définition des cartes du tarot
         const tarotCards = [
             { id: 0, name: "Le Mat", image: "/images/0-mat.jpg", keywords: "liberté, folie, début" },
@@ -803,7 +892,7 @@
             { id: 6, name: "L'Amoureux", image: "/images/6-amoureux.jpg", keywords: "choix, amour, harmonie" },
             { id: 7, name: "Le Chariot", image: "/images/7-chariot.jpg", keywords: "détermination, conquête, contrôle" },
             { id: 8, name: "La Justice", image: "/images/8-justice.jpg", keywords: "équilibre, vérité, loi" },
-            { id: 9, name: "L'Ermite", image: "/images/9-ermite.jpg", keywords: "introspection, solitude, prudence" },
+            { id: 9, name: "L'Hermite", image: "/images/9-hermite.jpg", keywords: "introspection, solitude, prudence" },
             { id: 10, name: "La Roue de Fortune", image: "/images/10-roue-de-fortune.jpg", keywords: "changement, destin, opportunité" },
             { id: 11, name: "La Force", image: "/images/11-force.jpg", keywords: "courage, influence, patience" },
             { id: 12, name: "Le Pendu", image: "/images/12-pendu.jpg", keywords: "sacrifice, perspective, attente" },
@@ -816,7 +905,7 @@
             { id: 19, name: "Le Soleil", image: "/images/19-soleil.jpg", keywords: "joie, succès, vitalité" },
             { id: 20, name: "Le Jugement", image: "/images/20-jugement.jpg", keywords: "renaissance, pardon, éveil" },
             { id: 21, name: "Le Monde", image: "/images/21-monde.jpg", keywords: "accomplissement, intégration, voyage" }
-];
+        ];
 
         // Variables pour stocker les cartes tirées
         const drawnCards = {
@@ -1070,6 +1159,6 @@
                 }, 500);
             }, 1000);
         });
-</script>
+    </script>
 </body>
 </html>
