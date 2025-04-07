@@ -7,12 +7,16 @@ export default async function handler(req, res) {
     }
 
     // Extraire les données du tirage
-    const { past, present, future } = req.body;
+   // Extraire les données du tirage
+const { past, present, future, question } = req.body;
 
-    // Vérifier que toutes les cartes sont présentes
-    if (!past || !present || !future) {
-      return res.status(400).json({ error: 'Données de tirage incomplètes' });
-    }
+// Vérifier que toutes les cartes sont présentes
+if (!past || !present || !future) {
+    return res.status(400).json({ error: 'Données de tirage incomplètes' });
+}
+
+// Utiliser une question par défaut si non fournie
+const userQuestion = question || "Guidance générale";
     
     try {
       // Appel à l'API Mistral
@@ -24,29 +28,32 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           model: "mistral-small", // Utiliser un modèle plus rapide
-          messages: [
-            {
-              role: "user",
-              content: `Tu es un expert en lecture de tarot. Interprète ce tirage de tarot à trois cartes avec détail.
-              
-              Passé: ${past.name} (mots-clés: ${past.keywords})
-              Présent: ${present.name} (mots-clés: ${present.keywords})
-              Futur: ${future.name} (mots-clés: ${future.keywords})
-              
-              Format de sortie exact à respecter sans modification:
-              <h3>Le Passé</h3>
-              <p>Interprétation du passé...</p>
-              
-              <h3>Le Présent</h3>
-              <p>Interprétation du présent...</p>
-              
-              <h3>Le Futur</h3>
-              <p>Interprétation du futur...</p>
-              
-              <h3>Synthèse</h3>
-              <p>Synthèse globale...</p>`
-            }
-          ],
+         messages: [
+    {
+        role: "user",
+        content: `Tu es un expert en lecture de tarot. Interprète ce tirage de tarot à trois cartes en réponse à la question: "${userQuestion}"
+        
+        Passé: ${past.name} (mots-clés: ${past.keywords})
+        Présent: ${present.name} (mots-clés: ${present.keywords})
+        Futur: ${future.name} (mots-clés: ${future.keywords})
+        
+        Format de sortie exact à respecter sans modification:
+        <h3>Question</h3>
+        <p>${userQuestion}</p>
+        
+        <h3>Le Passé</h3>
+        <p>Interprétation du passé...</p>
+        
+        <h3>Le Présent</h3>
+        <p>Interprétation du présent...</p>
+        
+        <h3>Le Futur</h3>
+        <p>Interprétation du futur...</p>
+        
+        <h3>Synthèse</h3>
+        <p>Synthèse globale...</p>`
+    }
+],
           temperature: 0.7,
           max_tokens: 1000 // Augmenter le nombre de tokens pour éviter la troncature
         })
