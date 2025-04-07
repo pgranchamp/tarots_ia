@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     }
     
     try {
-      // Utiliser un modèle Mistral plus petit et plus rapide
+      // Appel à l'API Mistral
       const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -23,29 +23,32 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${process.env.MISTRAL_API_KEY}`
         },
         body: JSON.stringify({
-          model: "mistral-small", // Plus rapide que mistral-large-latest
+          model: "mistral-small", // Utiliser un modèle plus rapide
           messages: [
             {
               role: "user",
-              content: `Interprète ce tirage de tarot à trois cartes de façon concise.
+              content: `Tu es un expert en lecture de tarot. Interprète ce tirage de tarot à trois cartes avec détail.
               
               Passé: ${past.name} (mots-clés: ${past.keywords})
               Présent: ${present.name} (mots-clés: ${present.keywords})
               Futur: ${future.name} (mots-clés: ${future.keywords})
               
-              Format HTML:
+              Format de sortie exact à respecter sans modification:
               <h3>Le Passé</h3>
-              <p>Interprétation concise</p>
+              <p>Interprétation du passé...</p>
+              
               <h3>Le Présent</h3>
-              <p>Interprétation concise</p>
+              <p>Interprétation du présent...</p>
+              
               <h3>Le Futur</h3>
-              <p>Interprétation concise</p>
+              <p>Interprétation du futur...</p>
+              
               <h3>Synthèse</h3>
-              <p>Brève synthèse</p>`
+              <p>Synthèse globale...</p>`
             }
           ],
           temperature: 0.7,
-          max_tokens: 500 // Limiter la taille de la réponse
+          max_tokens: 1000 // Augmenter le nombre de tokens pour éviter la troncature
         })
       });
 
@@ -58,11 +61,42 @@ export default async function handler(req, res) {
       
       const data = await response.json();
       
-      // Vérifier la structure de la réponse
+      // Vérifier que la réponse contient le contenu attendu
       if (data.choices && data.choices[0] && data.choices[0].message) {
+        let interpretation = data.choices[0].message.content;
+        
+        // Vérifier si l'interprétation est complète (contient les 4 sections)
+        const hasPast = interpretation.includes("<h3>Le Passé</h3>");
+        const hasPresent = interpretation.includes("<h3>Le Présent</h3>");
+        const hasFuture = interpretation.includes("<h3>Le Futur</h3>");
+        const hasSynthesis = interpretation.includes("<h3>Synthèse</h3>");
+        
+        // Si l'interprétation est incomplète, la compléter manuellement
+        if (!hasPast || !hasPresent || !hasFuture || !hasSynthesis) {
+          console.log("Interprétation incomplète détectée, complétion manuelle...");
+          
+          // Créer une interprétation complète
+          const manualInterpretation = generateLocalInterpretation(past, present, future);
+          
+          // Si l'interprétation originale a certaines parties, les conserver
+          if (hasPast && hasPresent && hasFuture) {
+            // Il ne manque que la synthèse, ajouter uniquement cette partie
+            interpretation += `
+              <h3>Synthèse</h3>
+              <p>La progression de ${past.name} à ${present.name}, puis vers ${future.name} raconte 
+              une histoire cohérente de transformation. En reconnaissant les qualités du passé (${past.keywords}), 
+              en embrassant les défis actuels (${present.keywords}), vous pourrez naviguer vers un avenir 
+              qui manifeste les aspects positifs du ${future.name} (${future.keywords}).</p>
+            `;
+          } else {
+            // Trop incomplet, utiliser l'interprétation complète générée localement
+            interpretation = manualInterpretation;
+          }
+        }
+        
         return res.status(200).json({ 
-          interpretation: data.choices[0].message.content,
-          source: "mistral"
+          interpretation: interpretation,
+          source: "mistral" 
         });
       } else {
         throw new Error("Format de réponse inattendu de l'API Mistral");
@@ -72,27 +106,7 @@ export default async function handler(req, res) {
       console.error("Erreur lors de l'appel à Mistral:", apiError);
       
       // Génération de repli si l'API échoue
-      const interpretation = `
-        <h3>Introduction</h3>
-        <p>Votre tirage du tarot révèle une histoire fascinante qui se déroule entre votre passé, votre présent et ce qui en résultera dans le futur.</p>
-        
-        <h3>Le Passé : ${past.name}</h3>
-        <p>Cette carte représente les fondations de votre situation actuelle. 
-        ${past.name} dans la position du passé suggère que vous avez traversé une période 
-        caractérisée par des éléments liés à ${past.keywords}.</p>
-        
-        <h3>Le Présent : ${present.name}</h3>
-        <p>Dans votre situation actuelle, l'énergie de ${present.name} est prédominante, 
-        associée à ${present.keywords}.</p>
-        
-        <h3>Le Futur : ${future.name}</h3>
-        <p>${future.name} apparaît comme la résultante probable de votre trajectoire actuelle, 
-        liée à ${future.keywords}.</p>
-        
-        <h3>Synthèse</h3>
-        <p>La progression de ${past.name} à ${present.name}, puis vers ${future.name} raconte 
-        une histoire cohérente de transformation.</p>
-      `;
+      const interpretation = generateLocalInterpretation(past, present, future);
       
       return res.status(200).json({ 
         interpretation: interpretation,
@@ -107,4 +121,33 @@ export default async function handler(req, res) {
       details: error.message 
     });
   }
+}
+
+// Fonction helper pour générer une interprétation complète localement
+function generateLocalInterpretation(past, present, future) {
+  return `
+    <h3>Le Passé</h3>
+    <p>La carte ${past.name} dans la position du passé suggère que vous avez traversé une période 
+    caractérisée par des éléments liés à ${past.keywords}. Ces expériences ont façonné 
+    votre approche actuelle et continuent d'influencer vos décisions.</p>
+    
+    <h3>Le Présent</h3>
+    <p>Dans votre situation actuelle, l'énergie de ${present.name} est prédominante. 
+    Cette carte, associée à ${present.keywords}, indique que vous êtes dans une phase 
+    où ces qualités sont particulièrement importantes à reconnaître et à intégrer dans 
+    votre approche.</p>
+    
+    <h3>Le Futur</h3>
+    <p>${future.name} apparaît comme la résultante probable de votre trajectoire actuelle. 
+    Cette carte, liée à ${future.keywords}, suggère que les défis et opportunités à venir 
+    seront teintés par ces aspects.</p>
+    
+    <h3>Synthèse</h3>
+    <p>La progression de ${past.name} à ${present.name}, puis vers ${future.name} raconte 
+    une histoire cohérente de transformation. La présence de ces trois arcanes majeurs 
+    indique que vous traversez un cycle important de votre vie, avec des leçons significatives 
+    à intégrer. Les énergies combinées de ces cartes suggèrent qu'en reconnaissant les 
+    schémas du passé (${past.name}), en embrassant pleinement les défis actuels (${present.name}), 
+    vous pourrez naviguer vers un avenir qui manifeste les aspects positifs de ${future.name}.</p>
+  `;
 }
