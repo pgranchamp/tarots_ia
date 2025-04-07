@@ -137,7 +137,27 @@
             opacity: 0.8;
             margin-top: 0.5rem;
         }
-        
+        .question-container {
+            margin: 1rem auto;
+            width: 100%;
+            max-width: 600px;
+        }
+.question-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 30px;
+    border: 2px solid var(--card-border);
+    background: rgba(30, 41, 59, 0.5);
+    color: var(--text-color);
+    font-size: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+.question-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(248, 213, 104, 0.3);
+}
         .tarot-board {
             display: flex;
             flex-direction: column;
@@ -707,7 +727,11 @@
             <h1>Tarot & IA</h1>
             <div class="intro">
                 <p>Bienvenue dans votre consultation de tarot guidée par l'intelligence artificielle.</p>
+                 <div class="question-container">
+                <input type="text" id="userQuestion" placeholder="Saisissez votre question..." class="question-input">
+            </div>
                 <p>Concentrez-vous sur votre question pendant que vous tirez trois cartes : une pour votre passé, une pour votre présent, et une pour le futur qui en résulte.</p>
+             
                 <div class="instruction">Touchez chaque emplacement pour tirer une carte</div>
             </div>
         </header>
@@ -892,7 +916,7 @@
             { id: 6, name: "L'Amoureux", image: "/images/6-amoureux.jpg", keywords: "choix, amour, harmonie" },
             { id: 7, name: "Le Chariot", image: "/images/7-chariot.jpg", keywords: "détermination, conquête, contrôle" },
             { id: 8, name: "La Justice", image: "/images/8-justice.jpg", keywords: "équilibre, vérité, loi" },
-            { id: 9, name: "L'Hermite", image: "/images/9-hermite.jpg", keywords: "introspection, solitude, prudence" },
+            { id: 9, name: "L'Ermite", image: "/images/9-ermite.jpg", keywords: "introspection, solitude, prudence" },
             { id: 10, name: "La Roue de Fortune", image: "/images/10-roue-de-fortune.jpg", keywords: "changement, destin, opportunité" },
             { id: 11, name: "La Force", image: "/images/11-force.jpg", keywords: "courage, influence, patience" },
             { id: 12, name: "Le Pendu", image: "/images/12-pendu.jpg", keywords: "sacrifice, perspective, attente" },
@@ -1015,23 +1039,28 @@
         }
 
         // Fonction pour obtenir l'interprétation des cartes depuis l'API
-        async function generateInterpretation(cards) {
-            try {
-                // Log pour le débogage
-                console.log("Envoi des cartes pour interprétation:", cards);
-                
-                // Appel à notre API serverless
-                const response = await fetch('/api/interpret', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        past: cards.past,
-                        present: cards.present,
-                        future: cards.future
-                    })
-                });
+    async function generateInterpretation(cards) {
+        try {
+            // Récupérer la question saisie par l'utilisateur
+            const userQuestion = document.getElementById('userQuestion').value || "Guidance générale";
+        
+            // Log pour le débogage
+            console.log("Envoi des cartes pour interprétation:", cards);
+            console.log("Question:", userQuestion);
+        
+            // Appel à notre API serverless
+            const response = await fetch('/api/interpret', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    past: cards.past,
+                    present: cards.present,
+                    future: cards.future,
+                    question: userQuestion
+                })
+            });
                 
                 // Vérifier si la réponse est OK
                 if (!response.ok) {
