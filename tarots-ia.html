@@ -259,28 +259,28 @@
     <script>
         // Définition des cartes du tarot
         const tarotCards = [
-            { id: 0, name: "Le Mat", image: "/api/placeholder/150/250", keywords: "liberté, folie, début" },
-            { id: 1, name: "Le Bateleur", image: "/api/placeholder/150/250", keywords: "habileté, potentiel, opportunité" },
-            { id: 2, name: "La Papesse", image: "/api/placeholder/150/250", keywords: "intuition, mystère, sagesse" },
-            { id: 3, name: "L'Impératrice", image: "/api/placeholder/150/250", keywords: "création, fertilité, abondance" },
-            { id: 4, name: "L'Empereur", image: "/api/placeholder/150/250", keywords: "autorité, structure, contrôle" },
-            { id: 5, name: "Le Pape", image: "/api/placeholder/150/250", keywords: "tradition, spiritualité, enseignement" },
-            { id: 6, name: "L'Amoureux", image: "/api/placeholder/150/250", keywords: "choix, amour, harmonie" },
-            { id: 7, name: "Le Chariot", image: "/api/placeholder/150/250", keywords: "détermination, conquête, contrôle" },
-            { id: 8, name: "La Justice", image: "/api/placeholder/150/250", keywords: "équilibre, vérité, loi" },
-            { id: 9, name: "L'Hermite", image: "/api/placeholder/150/250", keywords: "introspection, solitude, prudence" },
-            { id: 10, name: "La Roue de Fortune", image: "/api/placeholder/150/250", keywords: "changement, destin, opportunité" },
-            { id: 11, name: "La Force", image: "/api/placeholder/150/250", keywords: "courage, influence, patience" },
-            { id: 12, name: "Le Pendu", image: "/api/placeholder/150/250", keywords: "sacrifice, perspective, attente" },
-            { id: 13, name: "La Mort", image: "/api/placeholder/150/250", keywords: "fin, transition, transformation" },
-            { id: 14, name: "Tempérance", image: "/api/placeholder/150/250", keywords: "modération, équilibre, patience" },
-            { id: 15, name: "Le Diable", image: "/api/placeholder/150/250", keywords: "dépendance, matérialisme, obsession" },
-            { id: 16, name: "La Maison Dieu", image: "/api/placeholder/150/250", keywords: "catastrophe, révélation, libération" },
-            { id: 17, name: "L'Étoile", image: "/api/placeholder/150/250", keywords: "espoir, inspiration, sérénité" },
-            { id: 18, name: "La Lune", image: "/api/placeholder/150/250", keywords: "illusion, peur, intuition" },
-            { id: 19, name: "Le Soleil", image: "/api/placeholder/150/250", keywords: "joie, succès, vitalité" },
-            { id: 20, name: "Le Jugement", image: "/api/placeholder/150/250", keywords: "renaissance, pardon, éveil" },
-            { id: 21, name: "Le Monde", image: "/api/placeholder/150/250", keywords: "accomplissement, intégration, voyage" }
+            { id: 0, name: "Le Mat", image: "/images/0-mat.jpg", keywords: "liberté, folie, début" },
+            { id: 1, name: "Le Bateleur", image: "/images/1-bateleur.jpg", keywords: "habileté, potentiel, opportunité" },
+            { id: 2, name: "La Papesse", image: "/images/2-papesse.jpg", keywords: "intuition, mystère, sagesse" },
+            { id: 3, name: "L'Impératrice", image: "/images/3-imperatrice.jpg", keywords: "création, fertilité, abondance" },
+            { id: 4, name: "L'Empereur", image: "/images/4-empereur.jpg", keywords: "autorité, structure, contrôle" },
+            { id: 5, name: "Le Pape", image: "/images/5-pape.jpg", keywords: "tradition, spiritualité, enseignement" },
+            { id: 6, name: "L'Amoureux", image: "/images/6-amoureux.jpg", keywords: "choix, amour, harmonie" },
+            { id: 7, name: "Le Chariot", image: "/images/7-chariot.jpg", keywords: "détermination, conquête, contrôle" },
+            { id: 8, name: "La Justice", image: "/images/8-justice.jpg", keywords: "équilibre, vérité, loi" },
+            { id: 9, name: "L'Hermite", image: "/images/9-hermite.jpg", keywords: "introspection, solitude, prudence" },
+            { id: 10, name: "La Roue de Fortune", image: "/images/10-roue-de-fortune.jpg", keywords: "changement, destin, opportunité" },
+            { id: 11, name: "La Force", image: "/images/11-force.jpg", keywords: "courage, influence, patience" },
+            { id: 12, name: "Le Pendu", image: "/images/12-pendu.jpg", keywords: "sacrifice, perspective, attente" },
+            { id: 13, name: "La Mort", image: "/images/13-mort.jpg", keywords: "fin, transition, transformation" },
+            { id: 14, name: "Tempérance", image: "/images/14-temperance.jpg", keywords: "modération, équilibre, patience" },
+            { id: 15, name: "Le Diable", image: "/images/15-diable.jpg", keywords: "dépendance, matérialisme, obsession" },
+            { id: 16, name: "La Maison Dieu", image: "/images/16-maison-dieu.jpg", keywords: "catastrophe, révélation, libération" },
+            { id: 17, name: "L'Étoile", image: "/images/17-etoile.jpg", keywords: "espoir, inspiration, sérénité" },
+            { id: 18, name: "La Lune", image: "/images/18-lune.jpg", keywords: "illusion, peur, intuition" },
+            { id: 19, name: "Le Soleil", image: "/images/19-soleil.jpg", keywords: "joie, succès, vitalité" },
+            { id: 20, name: "Le Jugement", image: "/images/20-jugement.jpg", keywords: "renaissance, pardon, éveil" },
+            { id: 21, name: "Le Monde", image: "/images/21-monde.jpg", keywords: "accomplissement, intégration, voyage" }
         ];
 
         // Variables pour stocker les cartes tirées
@@ -337,7 +337,94 @@
             }
         }
 
-        // Fonction pour obtenir l'interprétation des cartes
+        // Fonction pour obtenir l'interprétation des cartes depuis l'API
+        async function generateInterpretation(cards) {
+            try {
+                // Log pour le débogage
+                console.log("Envoi des cartes pour interprétation:", cards);
+                
+                // Appel à notre API serverless
+                const response = await fetch('/api/interpret', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        past: cards.past,
+                        present: cards.present,
+                        future: cards.future
+                    })
+                });
+                
+                // Vérifier si la réponse est OK
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Erreur API:", response.status, errorText);
+                    throw new Error(`Erreur API: ${response.status}`);
+                }
+                
+                // Traiter la réponse JSON
+                const data = await response.json();
+                console.log("Réponse reçue:", data);
+                
+                // Vérifier si nous avons bien une interprétation
+                if (data.interpretation) {
+                    return data.interpretation;
+                } else if (data.error) {
+                    throw new Error(data.error);
+                } else {
+                    // Fallback: si l'API échoue, générer une interprétation locale
+                    return generateLocalInterpretation(cards);
+                }
+            } catch (error) {
+                console.error("Erreur lors de l'interprétation:", error);
+                
+                // En cas d'erreur, utiliser l'interprétation locale
+                return generateLocalInterpretation(cards);
+            }
+        }
+        
+        // Fonction de repli pour générer une interprétation locale si l'API échoue
+        function generateLocalInterpretation(cards) {
+            const past = cards.past;
+            const present = cards.present;
+            const future = cards.future;
+            
+            return `
+                <p>Votre tirage révèle une histoire fascinante à travers ces trois arcanes majeurs :</p>
+                
+                <h3>Le Passé : ${past.name}</h3>
+                <p>Cette carte représente les fondations de votre situation actuelle. 
+                ${past.name} dans la position du passé suggère que vous avez traversé une période 
+                caractérisée par des éléments liés à ${past.keywords}. Ces expériences ont façonné 
+                votre approche actuelle et continuent d'influencer vos décisions.</p>
+                
+                <h3>Le Présent : ${present.name}</h3>
+                <p>Dans votre situation actuelle, l'énergie de ${present.name} est prédominante. 
+                Cette carte, associée à ${present.keywords}, indique que vous êtes dans une phase 
+                où ces qualités sont particulièrement importantes à reconnaître et à intégrer dans 
+                votre approche.</p>
+                
+                <h3>Le Futur : ${future.name}</h3>
+                <p>${future.name} apparaît comme la résultante probable de votre trajectoire actuelle. 
+                Cette carte, liée à ${future.keywords}, suggère que les défis et opportunités à venir 
+                seront teintés par ces aspects.</p>
+                
+                <h3>Synthèse</h3>
+                <p>La progression de ${past.name} à ${present.name}, puis vers ${future.name} raconte 
+                une histoire cohérente de transformation. La présence de ces trois arcanes majeurs 
+                indique que vous traversez un cycle important de votre vie, avec des leçons significatives 
+                à intégrer. Les énergies combinées de ces cartes suggèrent qu'en reconnaissant les 
+                schémas du passé (${past.name}), en embrassant pleinement les défis actuels (${present.name}), 
+                vous pourrez naviguer vers un avenir qui manifeste les aspects positifs de ${future.name}.</p>
+                
+                <p>Pour maximiser le potentiel positif de ce tirage, soyez attentif aux moments où les thèmes 
+                de ${present.keywords} se manifestent dans votre vie quotidienne, car ils représentent des 
+                opportunités de transformation vers l'énergie de ${future.name}.</p>
+            `;
+        }
+
+        // Gestionnaire d'événement pour le bouton d'interprétation
         document.getElementById('interpretButton').addEventListener('click', async function() {
             // Afficher le loader et le texte de chargement
             document.getElementById('loader').style.display = 'block';
@@ -345,12 +432,10 @@
             document.getElementById('interpretButton').disabled = true;
             
             try {
-                // Dans un scénario réel, ceci serait un appel à l'API Mistral
-                // Simulons un délai pour l'effet
-                await new Promise(resolve => setTimeout(resolve, 2500));
-                
-                // Simuler une réponse de l'API
-                const interpretation = generateInterpretation(drawnCards);
+                // Appel à la fonction d'interprétation et attente de la résolution de la promesse
+                console.log("Demande d'interprétation pour:", drawnCards);
+                const interpretation = await generateInterpretation(drawnCards);
+                console.log("Interprétation reçue:", interpretation.substring(0, 100) + "...");
                 
                 // Afficher l'interprétation
                 document.getElementById('interpretationText').innerHTML = interpretation;
@@ -359,7 +444,7 @@
                 // Faire défiler jusqu'à l'interprétation
                 document.getElementById('interpretation').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
-                console.error("Erreur lors de l'interprétation:", error);
+                console.error("Erreur lors de l'affichage de l'interprétation:", error);
                 document.getElementById('interpretationText').innerHTML = 
                     "<p>Désolé, une erreur s'est produite lors de l'analyse de vos cartes. Veuillez réessayer.</p>";
                 document.getElementById('interpretation').style.display = 'block';
@@ -370,32 +455,6 @@
             }
         });
 
-        // Fonction pour générer une interprétation (simulée)
-        // Remplacez la fonction generateInterpretation par ceci
-async function generateInterpretation(cards) {
-  try {
-    const response = await fetch('/api/interpret', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        past: cards.past,
-        present: cards.present,
-        future: cards.future
-      })
-    });
-    
-    const data = await response.json();
-    if (data.error) {
-      throw new Error(data.error);
-    }
-    return data.interpretation;
-  } catch (error) {
-    console.error("Erreur:", error);
-    return "<p>Une erreur s'est produite lors de l'interprétation. Veuillez réessayer.</p>";
-  }
-}
         // Animation du deck au chargement
         window.addEventListener('load', function() {
             setTimeout(() => {
