@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarot & IA</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #0f1624;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle, #1e293b 0%, #0f1624 100%);
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        h1 {
+            color: #f8d568;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(248, 213, 104, 0.3);
+        }
+        .intro {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .tarot-board {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .tarot-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .card-position {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .card-label {
+            font-size: 1.2rem;
+            color: #a6b1e1;
+        }
+        .card-placeholder {
+            width: 150px;
+            height: 250px;
+            background-color: rgba(166, 177, 225, 0.1);
+            border: 2px solid #424b6c;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .card-placeholder:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            background-color: rgba(166, 177, 225, 0.2);
+        }
+        .card-placeholder.drawn {
+            background-color: transparent;
+            border: none;
+            cursor: default;
+        }
+        .card-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        .card-placeholder::before {
+            content: "Tirer";
+            color: #a6b1e1;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        .card-placeholder.drawn::before {
+            content: "";
+        }
+        .tarot-deck {
+            width: 160px;
+            height: 260px;
+            perspective: 1000px;
+            margin: 2rem auto;
+            position: relative;
+        }
+        .deck {
+            width: 150px;
+            height: 250px;
+            background-image: linear-gradient(135deg, #424b6c, #2c3455);
+            border: 2px solid #6472b8;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(166, 177, 225, 0.2);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .deck::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a6b1e1' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+            border-radius: 8px;
+        }
+        .deck::before {
+            content: "";
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f8d568' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z'%3E%3C/path%3E%3C/svg%3E");
+            opacity: 0.8;
+        }
+        .interpretation {
+            background-color: rgba(30, 41, 59, 0.8);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            border: 1px solid #424b6c;
+            text-align: left;
+            display: none;
+        }
+        .interpretation h2 {
+            color: #f8d568;
+            margin-top: 0;
+        }
+        .interpretation p {
+            line-height: 1.6;
+        }
+        button {
+            background-color: #6472b8;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #8492d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        button:disabled {
+            background-color: #4a5277;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #6472b8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .card-name {
+            margin-top: 0.5rem;
+            font-weight: bold;
+            color: #f8d568;
+        }
+        .loading-text {
+            margin-top: 1rem;
+            color: #a6b1e1;
+            font-style: italic;
+            display: none;
+        }
+        .reading-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* Animation de révélation */
+        @keyframes cardReveal {
+            0% { transform: rotateY(90deg); opacity: 0; }
+            100% { transform: rotateY(0deg); opacity: 1; }
+        }
+        .revealed {
+            animation: cardReveal 1s forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tarot & IA</h1>
+        <div class="intro">
+            <p>Bienvenue dans votre consultation de tarot guidée par l'intelligence artificielle.</p>
+            <p>Concentrez-vous sur votre question pendant que vous tirez trois cartes : une pour votre passé, une pour votre présent, et une pour le futur qui en résulte.</p>
+        </div>
+        
+        <div class="tarot-deck">
+            <div class="deck" id="tarotDeck"></div>
+        </div>
+        
+        <div class="tarot-board">
+            <div class="tarot-row">
+                <div class="card-position">
+                    <div class="card-label">Passé</div>
+                    <div class="card-placeholder" id="past" onclick="drawCard(this, 'past')"></div>
+                    <div class="card-name" id="pastName"></div>
+                </div>
+                <div class="card-position">
+                    <div class="card-label">Présent</div>
+                    <div class="card-placeholder" id="present" onclick="drawCard(this, 'present')"></div>
+                    <div class="card-name" id="presentName"></div>
+                </div>
+                <div class="card-position">
+                    <div class="card-label">Futur</div>
+                    <div class="card-placeholder" id="future" onclick="drawCard(this, 'future')"></div>
+                    <div class="card-name" id="futureName"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="reading-section">
+            <button id="interpretButton" disabled>Interpréter le tirage</button>
+            <div class="loader" id="loader"></div>
+            <div class="loading-text" id="loadingText">L'IA analyse vos cartes...</div>
+            <div class="interpretation" id="interpretation">
+                <h2>Interprétation du tirage</h2>
+                <div id="interpretationText"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Définition des cartes du tarot
+        const tarotCards = [
+            { id: 0, name: "Le Mat", image: "/api/placeholder/150/250", keywords: "liberté, folie, début" },
+            { id: 1, name: "Le Bateleur", image: "/api/placeholder/150/250", keywords: "habileté, potentiel, opportunité" },
+            { id: 2, name: "La Papesse", image: "/api/placeholder/150/250", keywords: "intuition, mystère, sagesse" },
+            { id: 3, name: "L'Impératrice", image: "/api/placeholder/150/250", keywords: "création, fertilité, abondance" },
+            { id: 4, name: "L'Empereur", image: "/api/placeholder/150/250", keywords: "autorité, structure, contrôle" },
+            { id: 5, name: "Le Pape", image: "/api/placeholder/150/250", keywords: "tradition, spiritualité, enseignement" },
+            { id: 6, name: "L'Amoureux", image: "/api/placeholder/150/250", keywords: "choix, amour, harmonie" },
+            { id: 7, name: "Le Chariot", image: "/api/placeholder/150/250", keywords: "détermination, conquête, contrôle" },
+            { id: 8, name: "La Justice", image: "/api/placeholder/150/250", keywords: "équilibre, vérité, loi" },
+            { id: 9, name: "L'Hermite", image: "/api/placeholder/150/250", keywords: "introspection, solitude, prudence" },
+            { id: 10, name: "La Roue de Fortune", image: "/api/placeholder/150/250", keywords: "changement, destin, opportunité" },
+            { id: 11, name: "La Force", image: "/api/placeholder/150/250", keywords: "courage, influence, patience" },
+            { id: 12, name: "Le Pendu", image: "/api/placeholder/150/250", keywords: "sacrifice, perspective, attente" },
+            { id: 13, name: "La Mort", image: "/api/placeholder/150/250", keywords: "fin, transition, transformation" },
+            { id: 14, name: "Tempérance", image: "/api/placeholder/150/250", keywords: "modération, équilibre, patience" },
+            { id: 15, name: "Le Diable", image: "/api/placeholder/150/250", keywords: "dépendance, matérialisme, obsession" },
+            { id: 16, name: "La Maison Dieu", image: "/api/placeholder/150/250", keywords: "catastrophe, révélation, libération" },
+            { id: 17, name: "L'Étoile", image: "/api/placeholder/150/250", keywords: "espoir, inspiration, sérénité" },
+            { id: 18, name: "La Lune", image: "/api/placeholder/150/250", keywords: "illusion, peur, intuition" },
+            { id: 19, name: "Le Soleil", image: "/api/placeholder/150/250", keywords: "joie, succès, vitalité" },
+            { id: 20, name: "Le Jugement", image: "/api/placeholder/150/250", keywords: "renaissance, pardon, éveil" },
+            { id: 21, name: "Le Monde", image: "/api/placeholder/150/250", keywords: "accomplissement, intégration, voyage" }
+        ];
+
+        // Variables pour stocker les cartes tirées
+        const drawnCards = {
+            past: null,
+            present: null,
+            future: null
+        };
+
+        // Mélange des cartes (algorithme de Fisher-Yates)
+        function shuffleCards(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // Deck mélangé
+        let shuffledDeck = [...tarotCards];
+        shuffleCards(shuffledDeck);
+
+        // Fonction pour tirer une carte
+        function drawCard(element, position) {
+            if (drawnCards[position] !== null || !element.classList.contains('card-placeholder')) {
+                return;
+            }
+
+            const card = shuffledDeck.pop();
+            drawnCards[position] = card;
+            
+            element.innerHTML = `<img src="${card.image}" alt="${card.name}" class="revealed">`;
+            element.classList.add('drawn');
+            
+            // Afficher le nom de la carte
+            document.getElementById(`${position}Name`).textContent = card.name;
+            
+            // Animer le deck
+            document.getElementById('tarotDeck').style.transform = 'translateY(-5px) rotate(' + (Math.random() * 3 - 1.5) + 'deg)';
+            setTimeout(() => {
+                document.getElementById('tarotDeck').style.transform = 'translateY(0) rotate(0deg)';
+            }, 300);
+            
+            // Vérifier si les trois cartes ont été tirées
+            checkAllCardsDrawn();
+        }
+
+        // Vérifier si toutes les cartes ont été tirées
+        function checkAllCardsDrawn() {
+            if (drawnCards.past && drawnCards.present && drawnCards.future) {
+                document.getElementById('interpretButton').disabled = false;
+            }
+        }
+
+        // Fonction pour obtenir l'interprétation des cartes
+        document.getElementById('interpretButton').addEventListener('click', async function() {
+            // Afficher le loader et le texte de chargement
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('loadingText').style.display = 'block';
+            document.getElementById('interpretButton').disabled = true;
+            
+            try {
+                // Dans un scénario réel, ceci serait un appel à l'API Mistral
+                // Simulons un délai pour l'effet
+                await new Promise(resolve => setTimeout(resolve, 2500));
+                
+                // Simuler une réponse de l'API
+                const interpretation = generateInterpretation(drawnCards);
+                
+                // Afficher l'interprétation
+                document.getElementById('interpretationText').innerHTML = interpretation;
+                document.getElementById('interpretation').style.display = 'block';
+                
+                // Faire défiler jusqu'à l'interprétation
+                document.getElementById('interpretation').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                console.error("Erreur lors de l'interprétation:", error);
+                document.getElementById('interpretationText').innerHTML = 
+                    "<p>Désolé, une erreur s'est produite lors de l'analyse de vos cartes. Veuillez réessayer.</p>";
+                document.getElementById('interpretation').style.display = 'block';
+            } finally {
+                // Cacher le loader
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('loadingText').style.display = 'none';
+            }
+        });
+
+        // Fonction pour générer une interprétation (simulée)
+        function generateInterpretation(cards) {
+            // Ceci simule la réponse que vous recevriez de l'API Mistral
+            // Dans une implémentation réelle, cette partie serait remplacée par un appel API
+            
+            const past = cards.past;
+            const present = cards.present;
+            const future = cards.future;
+            
+            let interpretation = `
+                <p>Votre tirage révèle une histoire fascinante à travers ces trois arcanes majeurs :</p>
+                
+                <h3>Le Passé : ${past.name}</h3>
+                <p>Cette carte représente les fondations de votre situation actuelle. 
+                ${past.name} dans la position du passé suggère que vous avez traversé une période 
+                caractérisée par des éléments liés à ${past.keywords}. Ces expériences ont façonné 
+                votre approche actuelle et continuent d'influencer vos décisions.</p>
+                
+                <h3>Le Présent : ${present.name}</h3>
+                <p>Dans votre situation actuelle, l'énergie de ${present.name} est prédominante. 
+                Cette carte, associée à ${present.keywords}, indique que vous êtes dans une phase 
+                où ces qualités sont particulièrement importantes à reconnaître et à intégrer dans 
+                votre approche.</p>
+                
+                <h3>Le Futur : ${future.name}</h3>
+                <p>${future.name} apparaît comme la résultante probable de votre trajectoire actuelle. 
+                Cette carte, liée à ${future.keywords}, suggère que les défis et opportunités à venir 
+                seront teintés par ces aspects.</p>
+                
+                <h3>Synthèse</h3>
+                <p>La progression de ${past.name} à ${present.name}, puis vers ${future.name} raconte 
+                une histoire cohérente de transformation. La présence de ces trois arcanes majeurs 
+                indique que vous traversez un cycle important de votre vie, avec des leçons significatives 
+                à intégrer. Les énergies combinées de ces cartes suggèrent qu'en reconnaissant les 
+                schémas du passé (${past.name}), en embrassant pleinement les défis actuels (${present.name}), 
+                vous pourrez naviguer vers un avenir qui manifeste les aspects positifs de ${future.name}.</p>
+                
+                <p>Pour maximiser le potentiel positif de ce tirage, soyez attentif aux moments où les thèmes 
+                de ${present.keywords} se manifestent dans votre vie quotidienne, car ils représentent des 
+                opportunités de transformation vers l'énergie de ${future.name}.</p>
+            `;
+            
+            return interpretation;
+        }
+
+        // Animation du deck au chargement
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('tarotDeck').style.transform = 'translateY(-10px) rotate(2deg)';
+                setTimeout(() => {
+                    document.getElementById('tarotDeck').style.transform = 'translateY(0) rotate(0deg)';
+                }, 500);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
