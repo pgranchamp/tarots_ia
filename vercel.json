@@ -6,6 +6,7 @@
   ],
   "routes": [
     { "src": "/", "dest": "/index.html" },
-    { "src": "/api/interpret", "dest": "/api/interpret.js" }
+    { "src": "/api/interpret", "dest": "/api/interpret.js" },
+    { "src": "/images/(.*)", "dest": "/public/images/$1" }
   ]
 }
