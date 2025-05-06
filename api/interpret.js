@@ -32,7 +32,7 @@ const userQuestion = question || "Guidance générale";
     {
         role: "user",
         content: `Tu es un expert en lecture de tarot. Interprète ce tirage de tarot à trois cartes en réponse à la question: "${userQuestion}"
-        
+        en faisant le lien, dans ta courte synthèse, entre les prédictions du tarot et celles de l'IA
         Passé: ${past.name} (mots-clés: ${past.keywords})
         Présent: ${present.name} (mots-clés: ${present.keywords})
         Futur: ${future.name} (mots-clés: ${future.keywords})
